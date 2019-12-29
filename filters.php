@@ -199,8 +199,8 @@ class filters extends rcube_plugin{
     $this->register_handler('plugin.body', array($this, 'filters_form'));
     $this->rc->output->set_pagetitle($this->gettext('filters'));
 
-    if (isset($_GET[filterid])){
-      $filter_id = $_GET[filterid];
+    if (array_key_exists('filterid', $_GET) && !empty($_GET['filterid'])) {
+      $filter_id = $_GET['filterid'];
       $arr_prefs = $user->get_prefs();
       $arr_prefs['filters'][$filter_id] = '';
       $arr_prefs['filters'] = array_diff($arr_prefs['filters'], array(''));
