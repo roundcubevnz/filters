@@ -3,7 +3,7 @@ Roundcube Plugin Filters
 
 Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
 
-@version 2.2.0
+@version 2.2.1
 @author Roberto Zarrelli <zarrelli@unimol.it>
 @developer Artur Petrov <artur@phpchain.ru>
 
