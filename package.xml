@@ -11,7 +11,7 @@
 		<name>Roberto Zarrelli</name>
 		<user>-</user>
 		<email>zarrelli@unimol.it</email>
-		<active>yes</active>
+		<active>no</active>
 	</lead>
 	<lead>
 		<name>Artur Petrov</name>
@@ -19,9 +19,9 @@
 		<email>artur@phpchain.ru</email>
 		<active>yes</active>
 	</lead>
-	<date>2019-06-19</date>
+	<date>2020-01-13</date>
 	<version>
-		<release>2.2.0</release>
+		<release>2.2.1</release>
 		<api>2.2.0</api>
 	</version>
 	<stability>
