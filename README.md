@@ -118,3 +118,6 @@ History
 * 2.2.0:
   - Fixed error "filters have stopped working after an update from version 2.1.7 to 2.1.9" (https://github.com/6ec123321/filters/issues/46);
   - Fixed error "Folder name with single quotation marks not filtered".
+* 2.2.1:
+  - Fix design for elastic skin - thanks to nicolas-joubert (https://github.com/6ec123321/filters/pull/53).
+  
