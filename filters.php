@@ -199,8 +199,8 @@ class filters extends rcube_plugin{
     $this->register_handler('plugin.body', array($this, 'filters_form'));
     $this->rc->output->set_pagetitle($this->gettext('filters'));
 
-    if (isset($_GET[filterid])){
-      $filter_id = $_GET[filterid];
+    if (isset($_GET['filterid'])){
+      $filter_id = $_GET['filterid'];
       $arr_prefs = $user->get_prefs();
       $arr_prefs['filters'][$filter_id] = '';
       $arr_prefs['filters'] = array_diff($arr_prefs['filters'], array(''));
@@ -222,7 +222,7 @@ class filters extends rcube_plugin{
     if (method_exists($this->rc,'imap_connect')) $this->rc->imap_connect();
     else $this->rc->storage_connect();
 
-    $table = new html_table(array('cols' => 2));
+    $table = new html_table(array('cols' => 2, 'class' => 'propform cols-sm-6-6'));
     $table->add('title', rcube_utils::rep_specialchars_output($this->gettext('whatfilter').":", 'html'));
 
     $select = new html_select(array('name' => '_whatfilter', 'id' => 'whatfilter'));
@@ -310,29 +310,55 @@ class filters extends rcube_plugin{
       }
     }
 
-    $out = html::div(array('class' => 'box'),
-      html::div(array('id' => 'prefs-title', 'class' => 'boxtitle'), $this->gettext('filters')).
-      html::div(array('class' => 'boxcontent'), $table->show() .
-      html::p(null,
-        $this->rc->output->button(array(
-          'command' => 'plugin.filters-save',
-          'type' => 'input',
-          'class' => 'button mainaction',
-          'label' => 'save'
-      )))));
-    $out.= html::div(array('id' => 'prefs-title','class' => 'boxtitle'), $this->gettext('storedfilters')).
-      html::div(array('class' => 'uibox listbox scroller','style'=>'margin-top:250px;'),
-        html::div(array('class' => 'boxcontent'), $table2->show() ));
+	if ($this->rc->config->get('skin') == 'elastic') {
+		$out = html::tag('fieldset', array('class' => 'main'),
+		  html::tag('legend', null, $this->gettext('mainoptions')). 
+		  $table->show() .
+		  html::p(null,
+		    $this->rc->output->button(array(
+			  'command' => 'plugin.filters-save',
+			  'type' => 'input',
+			  'class' => 'button mainaction',
+			  'label' => 'save'
+		    ))
+		  )
+		);
+
+		$out.= html::tag('fieldset', array('id' => 'prefs-title', 'class' => 'boxtitle3'), 
+		  html::tag('legend', null, $this->gettext('storedfilters')).
+		  $table2->show()
+		);
+	} else {
+		$out = html::div(array('class' => 'box'),
+		  html::div(array('id' => 'prefs-title', 'class' => 'boxtitle'), $this->gettext('filters')).
+		  html::div(array('class' => 'boxcontent'), $table->show() .
+		  html::p(null,
+			$this->rc->output->button(array(
+			  'command' => 'plugin.filters-save',
+			  'type' => 'input',
+			  'class' => 'button mainaction',
+			  'label' => 'save'
+		  )))));
+		$out.= html::div(array('id' => 'prefs-title','class' => 'boxtitle'), $this->gettext('storedfilters')).
+		  html::div(array('class' => 'uibox listbox scroller','style'=>'margin-top:250px;'),
+			html::div(array('class' => 'boxcontent'), $table2->show() ));
+	}
 
     $this->rc->output->add_gui_object('filtersform', 'filters-form');
 
-    return $this->rc->output->form_tag(array(
+    $form = $this->rc->output->form_tag(array(
         'id' => 'filters-form',
         'name' => 'filters-form',
         'method' => 'post',
-	'class' => 'propform',
+	    'class' => 'propform cols-sm-6-6',
         'action' => './?_task=settings&_action=plugin.filters-save',
     ), $out);
+	
+	if ($this->rc->config->get('skin') == 'elastic') {
+		return html::div(array('class' => 'formcontent'), $form);
+	} else {
+		return $form;
+	}
 
   }
 
