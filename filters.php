@@ -81,14 +81,8 @@ class filters extends rcube_plugin{
 
   function filters_checkmsg($mlist){
     $user = $this->rc->user;
-    if (method_exists($this->rc->imap,'get_mailbox_name')) {
-      $imap = $this->rc->imap;
-      $open_mbox = $imap->get_mailbox_name();
-    }
-    else{
-      $imap = $this->rc->storage;
-      $open_mbox = $imap->get_folder();
-    }
+    $imap = $this->rc->storage;
+    $open_mbox = $imap->get_folder();
 
     $this->open_mbox=$open_mbox;
 
@@ -199,8 +193,8 @@ class filters extends rcube_plugin{
     $this->register_handler('plugin.body', array($this, 'filters_form'));
     $this->rc->output->set_pagetitle($this->gettext('filters'));
 
-    if (isset($_GET[filterid])){
-      $filter_id = $_GET[filterid];
+    if (isset($_GET["filterid"])){
+      $filter_id = $_GET["filterid"];
       $arr_prefs = $user->get_prefs();
       $arr_prefs['filters'][$filter_id] = '';
       $arr_prefs['filters'] = array_diff($arr_prefs['filters'], array(''));
@@ -321,7 +315,7 @@ class filters extends rcube_plugin{
           'label' => 'save'
       )))));
     $out.= html::div(array('id' => 'prefs-title','class' => 'boxtitle'), $this->gettext('storedfilters')).
-      html::div(array('class' => 'uibox listbox scroller','style'=>'margin-top:250px;'),
+      html::div(array('class' => 'uibox listbox scroller','style'=>'margin-top:50px;overflow-y: scroll;height: 500px;'),
         html::div(array('class' => 'boxcontent'), $table2->show() ));
 
     $this->rc->output->add_gui_object('filtersform', 'filters-form');
