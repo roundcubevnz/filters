@@ -315,7 +315,7 @@ class filters extends rcube_plugin{
           'label' => 'save'
       )))));
     $out.= html::div(array('id' => 'prefs-title','class' => 'boxtitle'), $this->gettext('storedfilters')).
-      html::div(array('class' => 'uibox listbox scroller','style'=>'margin-top:50px;overflow-y: scroll;height: 500px;'),
+      html::div(array('class' => 'uibox listbox scroller','style'=>'margin-top:50px;overflow-y: scroll;height: height: calc( 100dvh - 500px );'),
         html::div(array('class' => 'boxcontent'), $table2->show() ));
 
     $this->rc->output->add_gui_object('filtersform', 'filters-form');
