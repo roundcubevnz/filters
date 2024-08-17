@@ -1,10 +1,11 @@
 Roundcube Plugin Filters
 ============================
 
+Roundcube Webmail 1.6 compatible.
 Plugin that adds a new tab to the settings section to create client-side e-mail filtering.
 
-@version 2.2.0
-@author Roberto Zarrelli <zarrelli@unimol.it>
+@version 2.3.0
+@author Yoshioki Matsunaga <yoshioki@matsunaga.me.uk>
 @developer Artur Petrov <artur@phpchain.ru>
 
 Installation
@@ -29,7 +30,7 @@ Installation (ISPConfig 3.1)
 ```
 #!/bin/bash
 cd /usr/share/roundcube/plugins
-wget https://github.com/6ec123321/filters/archive/master.zip
+wget https://github.com/yoshioki/filters/archive/master.zip
 unzip master.zip && mv filters-master filters
 cd filters && mkdir /etc/roundcube/plugins/filters
 mv config.inc.php /etc/roundcube/plugins/filters/config.inc.php
@@ -118,3 +119,5 @@ History
 * 2.2.0:
   - Fixed error "filters have stopped working after an update from version 2.1.7 to 2.1.9" (https://github.com/6ec123321/filters/issues/46);
   - Fixed error "Folder name with single quotation marks not filtered".
+* 2.3.0
+  - Fixed for Roundcubemail 1.6.6;

@@ -14,6 +14,7 @@ class filters extends rcube_plugin{
 
   public $task = 'login|mail|settings';
 
+  private $rc;
   private $autoAddSpamFilterRule;
   private $spam_subject;
   private $spam_headers = array();
@@ -64,7 +65,13 @@ class filters extends rcube_plugin{
  function storage_init($p)
   {
     if ($add_headers = (array)$this->rc->config->get('spam_headers', array()))
-      $p['fetch_headers'] = trim($p['fetch_headers'].' ' . strtoupper(join(' ', $add_headers)));
+      if (isset($p['fetch_headers'])) {
+        $p['fetch_headers'] .= trim(' ' . strtoupper(join(' ', $add_headers)));
+      }
+      else {
+        $p['fetch_headers'] = trim(strtoupper(join(' ', $add_headers)));
+      }
+
     return $p;
   }
 
@@ -81,14 +88,8 @@ class filters extends rcube_plugin{
 
   function filters_checkmsg($mlist){
     $user = $this->rc->user;
-    if (method_exists($this->rc->imap,'get_mailbox_name')) {
-      $imap = $this->rc->imap;
-      $open_mbox = $imap->get_mailbox_name();
-    }
-    else{
-      $imap = $this->rc->storage;
-      $open_mbox = $imap->get_folder();
-    }
+    $imap = $this->rc->storage;
+    $open_mbox = $imap->get_folder();
 
     $this->open_mbox=$open_mbox;
 
@@ -103,12 +104,14 @@ class filters extends rcube_plugin{
 	  // if saved source folder not exists set to INBOX
 	  if (empty($saved_filter['srcfolder'])) $saved_filter['srcfolder'] = 'INBOX';
 	  // if saved destination folder exists and current folder is "check folder"
+      $filterpriority = isset($saved_filter['filterpriority']) ? $saved_filter['filterpriority'] : '';
+      $markread = isset($saved_filter['markread']) ? $saved_filter['markread'] : '';
 	  if (method_exists($imap,'mailbox_exists')){
 		if ($imap->mailbox_exists($saved_filter['destfolder']) && $imap->mailbox_exists($saved_filter['srcfolder']) && $saved_filter['srcfolder']==$open_mbox && $saved_filter['destfolder']!=$saved_filter['srcfolder']){
 		  $saved_filter['searchstring'] = html_entity_decode($saved_filter['searchstring']);
 		  // destfolder#messages#filterpriority#markread
 		  $this->searchstring[ $saved_filter['whatfilter'] ][ $saved_filter['searchstring'] ] = 
-			$saved_filter['destfolder']."#".$saved_filter['messages']."#".$saved_filter['filterpriority']."#".$saved_filter['markread'];
+			$saved_filter['destfolder']."#".$saved_filter['messages']."#".$filterpriority."#".$markread;
 		}
 	  }
 	  if (!method_exists($imap,'mailbox_exists')){
@@ -116,7 +119,7 @@ class filters extends rcube_plugin{
                   $saved_filter['searchstring'] = html_entity_decode($saved_filter['searchstring']);
                   // destfolder#messages#filterpriority#markread
                   $this->searchstring[ $saved_filter['whatfilter'] ][ $saved_filter['searchstring'] ] =
-                        $saved_filter['destfolder']."#".$saved_filter['messages']."#".$saved_filter['filterpriority']."#".$saved_filter['markread'];
+                        $saved_filter['destfolder']."#".$saved_filter['messages']."#".$filterpriority."#".$markread;
 		}
 	  }
 	}
@@ -168,7 +171,8 @@ class filters extends rcube_plugin{
     $destfolder = trim(rcube_utils::get_input_value('_folders', rcube_utils::INPUT_POST, true));
     $whatfilter = trim(rcube_utils::get_input_value('_whatfilter', rcube_utils::INPUT_POST, true));
     $messages = trim(rcube_utils::get_input_value('_messages', rcube_utils::INPUT_POST, true));
-    $filterpriority = trim(rcube_utils::get_input_value('_checkbox', rcube_utils::INPUT_POST, true));
+    $filterpriority = rcube_utils::get_input_value('_checkbox', rcube_utils::INPUT_POST, true);
+    $filterpriority = !empty($filterpriority) ? trim($filterpriority) : $filterpriority;
     $markread = trim(rcube_utils::get_input_value('_markread', rcube_utils::INPUT_POST, true));
 
     if ($searchstring == "")
@@ -199,11 +203,13 @@ class filters extends rcube_plugin{
     $this->register_handler('plugin.body', array($this, 'filters_form'));
     $this->rc->output->set_pagetitle($this->gettext('filters'));
 
-    if (isset($_GET[filterid])){
-      $filter_id = $_GET[filterid];
+    if (isset($_GET["filterid"])){
+      $filter_id = $_GET["filterid"];
       $arr_prefs = $user->get_prefs();
       $arr_prefs['filters'][$filter_id] = '';
-      $arr_prefs['filters'] = array_diff($arr_prefs['filters'], array(''));
+      foreach ($arr_prefs['filters'] as $key => $saved_filter){
+        if (empty($saved_filter)) unset($arr_prefs['filters'][$key]);
+      }
       if ($user->save_prefs($arr_prefs))
         $this->rc->output->command('display_message', $this->gettext('successfullydeleted'), 'confirmation');
       else
@@ -321,7 +327,7 @@ class filters extends rcube_plugin{
           'label' => 'save'
       )))));
     $out.= html::div(array('id' => 'prefs-title','class' => 'boxtitle'), $this->gettext('storedfilters')).
-      html::div(array('class' => 'uibox listbox scroller','style'=>'margin-top:250px;'),
+      html::div(array('class' => 'uibox listbox scroller','style'=>'margin-top:50px;overflow-y: scroll;height: calc( 100dvh - 500px );'),
         html::div(array('class' => 'boxcontent'), $table2->show() ));
 
     $this->rc->output->add_gui_object('filtersform', 'filters-form');
